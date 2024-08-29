@@ -23,10 +23,7 @@ export class TransactionRecordsService {
   }
 
   update(id: number, updateTransactionRecordDto: UpdateTransactionRecordDto) {
-    return this.transactionRecordRepository.update(
-      id,
-      updateTransactionRecordDto,
-    );
+    return this.transactionRecordRepository.update(id, updateTransactionRecordDto);
   }
 
   remove(id: number) {

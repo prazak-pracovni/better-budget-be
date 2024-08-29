@@ -5,4 +5,5 @@ export type AccessToken = {
 export type AccessTokenPayload = {
   email: string;
   sub: string;
+  exp: number;
 };
