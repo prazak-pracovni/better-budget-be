@@ -17,7 +17,7 @@ export class AuthService {
   ) {}
 
   async register(user: CreateUserDto, response: Response): Promise<void> {
-    const existingUser = await this._usersService.findOneByEmail(user.email);
+    const existingUser = await this._usersService.findOne({ email: user.email });
     if (existingUser) {
       throw new BadRequestException('User with this email address already exists');
     }
@@ -53,7 +53,7 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string): Promise<User> {
-    const user: User = await this._usersService.findOneByEmail(email);
+    const user: User = await this._usersService.findOne({ email });
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -64,8 +64,8 @@ export class AuthService {
     return user;
   }
 
-  async validateUserRefreshToken(refreshToken: string, userId: string): Promise<User> {
-    const user: User = await this._usersService.findOneById(userId);
+  async validateUserRefreshToken(refreshToken: string, id: string): Promise<User> {
+    const user: User = await this._usersService.findOne({ id });
 
     if (!user) {
       throw new BadRequestException('User not found');

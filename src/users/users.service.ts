@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -10,35 +10,27 @@ export class UsersService {
   @InjectRepository(User)
   private _userRepository: Repository<User>;
 
-  create(createUserDto: CreateUserDto) {
-    return this._userRepository.save(createUserDto);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    return await this._userRepository.save(createUserDto);
   }
 
-  findAll() {
-    return this._userRepository.find();
+  async findAll(): Promise<User[]> {
+    return await this._userRepository.find();
   }
 
-  findOneByEmail(email: string) {
-    return this._userRepository.findOneBy({ email });
+  async findOne(query: Partial<User>): Promise<User> {
+    return await this._userRepository.findOneBy(query);
   }
 
-  findOneById(id: string) {
-    return this._userRepository.findOneBy({ id });
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
+    return await this._userRepository.update(id, updateUserDto);
   }
 
-  findOneByRefreshToken(refreshToken: string) {
-    return this._userRepository.findOneBy({ refreshToken });
+  async updateRefreshToken(id: string, refreshToken: string): Promise<UpdateResult> {
+    return await this._userRepository.update(id, { refreshToken });
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this._userRepository.update(id, updateUserDto);
-  }
-
-  updateRefreshToken(id: string, refreshToken: string) {
-    return this._userRepository.update(id, { refreshToken });
-  }
-
-  remove(id: string) {
-    return this._userRepository.delete(id);
+  async remove(id: string): Promise<DeleteResult> {
+    return await this._userRepository.delete(id);
   }
 }

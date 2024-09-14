@@ -3,6 +3,8 @@ import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { Category } from './entities/category.entity';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -10,27 +12,27 @@ export class CategoriesController {
   constructor(private readonly _categoriesService: CategoriesService) {}
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
+  async create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
     return this._categoriesService.create(createCategoryDto);
   }
 
   @Get()
-  findAll() {
+  async findAll(): Promise<Category[]> {
     return this._categoriesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string): Promise<Category> {
     return this._categoriesService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+  async update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto): Promise<UpdateResult> {
     return this._categoriesService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<DeleteResult> {
     return this._categoriesService.remove(id);
   }
 }
