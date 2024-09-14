@@ -1,34 +1,30 @@
-import { Controller, Post, UseGuards, Request, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
-import { AccessToken } from './types/access-token.type';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { AuthRefreshTokenService } from './auth-refresh-token.service';
-import { LocalAuthGuard } from './local-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { Response } from 'express';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 
 @ApiTags('Auth')
 @Public()
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private _authService: AuthService,
-    private _authRefreshTokenService: AuthRefreshTokenService,
-  ) {}
+  constructor(private readonly _authService: AuthService) {}
 
   @Throttle({ short: { limit: 2, ttl: 1000 }, long: { limit: 5, ttl: 60000 } })
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req): Promise<AccessToken | BadRequestException> {
-    return this._authService.login(req.user);
+  async login(@Request() req, @Res({ passthrough: true }) response: Response) {
+    await this._authService.login(req.user, response);
   }
 
   @Post('register')
-  async register(@Body() registerBody: CreateUserDto): Promise<AccessToken | BadRequestException> {
-    return await this._authService.register(registerBody);
+  async register(@Body() registerBody: CreateUserDto, @Res({ passthrough: true }) response: Response) {
+    await this._authService.register(registerBody, response);
   }
 
   @Throttle({
@@ -38,11 +34,7 @@ export class AuthController {
   @UseGuards(JwtRefreshAuthGuard)
   @Public()
   @Post('refresh-token')
-  async refreshToken(@Request() req) {
-    return this._authRefreshTokenService.generateTokenPair(
-      req.user,
-      req.headers.authorization?.split(' ')[1],
-      req.user.refreshTokenExpiresAt,
-    );
+  async refreshToken(@Request() req, @Res({ passthrough: true }) response: Response) {
+    await this._authService.login(req.user, response);
   }
 }

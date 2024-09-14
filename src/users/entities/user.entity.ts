@@ -16,6 +16,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column()
+  refreshToken: string;
+
   @OneToMany(() => Category, (category) => category.createdBy)
   categories: Category[];
 

@@ -1,20 +1,59 @@
 import * as bcrypt from 'bcrypt';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { AccessToken } from './types/access-token.type';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
+import { AccessTokenPayload } from './types/access-token.type';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    private readonly _jwtService: JwtService,
+    private readonly _usersService: UsersService,
+    private readonly _configService: ConfigService,
   ) {}
 
+  async register(user: CreateUserDto, response: Response): Promise<void> {
+    const existingUser = await this._usersService.findOneByEmail(user.email);
+    if (existingUser) {
+      throw new BadRequestException('User with this email address already exists');
+    }
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    const newUser = { ...user, password: hashedPassword };
+
+    const createdUser = await this._usersService.create(newUser);
+    this.login(createdUser, response);
+  }
+
+  async login(user: User, response: Response): Promise<void> {
+    const payload: AccessTokenPayload = { email: user.email, sub: user.id };
+
+    const accessToken = this._jwtService.sign(payload, {
+      secret: this._configService.get('JWT_SECRET'),
+      expiresIn: this._configService.get('JWT_EXPIRATION_TIME'),
+    });
+
+    const refreshToken = this._jwtService.sign(payload, {
+      secret: this._configService.get('JWT_REFRESH_SECRET'),
+      expiresIn: this._configService.get('JWT_REFRESH_EXPIRATION_TIME'),
+    });
+
+    await this._usersService.updateRefreshToken(user.id, await bcrypt.hash(refreshToken, 10));
+
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      expires: new Date(Date.now() + 1000 * 60),
+      sameSite: 'none',
+    });
+    response.json({ accessToken });
+  }
+
   async validateUser(email: string, password: string): Promise<User> {
-    const user: User = await this.usersService.findOne(email);
+    const user: User = await this._usersService.findOneByEmail(email);
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -25,22 +64,17 @@ export class AuthService {
     return user;
   }
 
-  async login(user: User): Promise<AccessToken> {
-    const payload = { email: user.email, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
-  }
+  async validateUserRefreshToken(refreshToken: string, userId: string): Promise<User> {
+    const user: User = await this._usersService.findOneById(userId);
 
-  async register(user: CreateUserDto): Promise<AccessToken> {
-    const existingUser = await this.usersService.findOne(user.email);
-    if (existingUser) {
-      throw new BadRequestException('email already exists');
+    if (!user) {
+      throw new BadRequestException('User not found');
     }
-    const hashedPassword = await bcrypt.hash(user.password, 10);
-    const newUser = { ...user, password: hashedPassword };
+    const authenticated = bcrypt.compareSync(refreshToken, user.refreshToken);
 
-    const createdUser = await this.usersService.create(newUser);
-    return this.login(createdUser);
+    if (!authenticated) {
+      throw new BadRequestException('Invalid refresh token');
+    }
+    return user;
   }
 }

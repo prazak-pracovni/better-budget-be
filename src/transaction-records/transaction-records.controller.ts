@@ -7,30 +7,30 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Transaction records')
 @Controller('transaction-records')
 export class TransactionRecordsController {
-  constructor(private readonly transactionRecordsService: TransactionRecordsService) {}
+  constructor(private readonly _transactionRecordsService: TransactionRecordsService) {}
 
   @Post()
   create(@Body() createTransactionRecordDto: CreateTransactionRecordDto) {
-    return this.transactionRecordsService.create(createTransactionRecordDto);
+    return this._transactionRecordsService.create(createTransactionRecordDto);
   }
 
   @Get()
   findAll() {
-    return this.transactionRecordsService.findAll();
+    return this._transactionRecordsService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.transactionRecordsService.findOne(id);
+    return this._transactionRecordsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTransactionRecordDto: UpdateTransactionRecordDto) {
-    return this.transactionRecordsService.update(+id, updateTransactionRecordDto);
+    return this._transactionRecordsService.update(+id, updateTransactionRecordDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.transactionRecordsService.remove(+id);
+    return this._transactionRecordsService.remove(+id);
   }
 }

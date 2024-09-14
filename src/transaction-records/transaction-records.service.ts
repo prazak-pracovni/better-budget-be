@@ -8,25 +8,25 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class TransactionRecordsService {
   @InjectRepository(TransactionRecord)
-  private transactionRecordRepository: Repository<TransactionRecord>;
+  private _transactionRecordRepository: Repository<TransactionRecord>;
 
   create(createTransactionRecordDto: CreateTransactionRecordDto) {
-    return this.transactionRecordRepository.save(createTransactionRecordDto);
+    return this._transactionRecordRepository.save(createTransactionRecordDto);
   }
 
   findAll() {
-    return this.transactionRecordRepository.find();
+    return this._transactionRecordRepository.find();
   }
 
   findOne(id: string) {
-    return this.transactionRecordRepository.findOneBy({ id });
+    return this._transactionRecordRepository.findOneBy({ id });
   }
 
   update(id: number, updateTransactionRecordDto: UpdateTransactionRecordDto) {
-    return this.transactionRecordRepository.update(id, updateTransactionRecordDto);
+    return this._transactionRecordRepository.update(id, updateTransactionRecordDto);
   }
 
   remove(id: number) {
-    return this.transactionRecordRepository.delete(id);
+    return this._transactionRecordRepository.delete(id);
   }
 }

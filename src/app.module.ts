@@ -8,7 +8,6 @@ import { TransactionRecordsModule } from './transaction-records/transaction-reco
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt.guard';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtStrategy } from './auth/strategy/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
@@ -40,7 +39,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    JwtStrategy,
   ],
 })
 export class AppModule {}

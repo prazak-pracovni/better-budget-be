@@ -8,25 +8,37 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class UsersService {
   @InjectRepository(User)
-  private userRepository: Repository<User>;
+  private _userRepository: Repository<User>;
 
   create(createUserDto: CreateUserDto) {
-    return this.userRepository.save(createUserDto);
+    return this._userRepository.save(createUserDto);
   }
 
   findAll() {
-    return this.userRepository.find();
+    return this._userRepository.find();
   }
 
-  findOne(email: string) {
-    return this.userRepository.findOneBy({ email });
+  findOneByEmail(email: string) {
+    return this._userRepository.findOneBy({ email });
+  }
+
+  findOneById(id: string) {
+    return this._userRepository.findOneBy({ id });
+  }
+
+  findOneByRefreshToken(refreshToken: string) {
+    return this._userRepository.findOneBy({ refreshToken });
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
-    return this.userRepository.update(id, updateUserDto);
+    return this._userRepository.update(id, updateUserDto);
+  }
+
+  updateRefreshToken(id: string, refreshToken: string) {
+    return this._userRepository.update(id, { refreshToken });
   }
 
   remove(id: string) {
-    return this.userRepository.delete(id);
+    return this._userRepository.delete(id);
   }
 }

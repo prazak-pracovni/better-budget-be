@@ -8,25 +8,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class CategoriesService {
   @InjectRepository(Category)
-  private categoryRepository: Repository<Category>;
+  private _categoryRepository: Repository<Category>;
 
   create(createCategoryDto: CreateCategoryDto) {
-    return this.categoryRepository.save(createCategoryDto);
+    return this._categoryRepository.save(createCategoryDto);
   }
 
   findAll() {
-    return this.categoryRepository.find();
+    return this._categoryRepository.find();
   }
 
   findOne(id: string) {
-    return this.categoryRepository.findOneBy({ id });
+    return this._categoryRepository.findOneBy({ id });
   }
 
   update(id: string, updateCategoryDto: UpdateCategoryDto) {
-    return this.categoryRepository.update(id, updateCategoryDto);
+    return this._categoryRepository.update(id, updateCategoryDto);
   }
 
   remove(id: string) {
-    return this.categoryRepository.delete(id);
+    return this._categoryRepository.delete(id);
   }
 }
