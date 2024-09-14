@@ -18,12 +18,12 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req, @Res({ passthrough: true }) response: Response) {
+  async login(@Request() req, @Res({ passthrough: true }) response: Response): Promise<void> {
     await this._authService.login(req.user, response);
   }
 
   @Post('register')
-  async register(@Body() registerBody: CreateUserDto, @Res({ passthrough: true }) response: Response) {
+  async register(@Body() registerBody: CreateUserDto, @Res({ passthrough: true }) response: Response): Promise<void> {
     await this._authService.register(registerBody, response);
   }
 
@@ -34,7 +34,7 @@ export class AuthController {
   @UseGuards(JwtRefreshAuthGuard)
   @Public()
   @Post('refresh-token')
-  async refreshToken(@Request() req, @Res({ passthrough: true }) response: Response) {
+  async refreshToken(@Request() req, @Res({ passthrough: true }) response: Response): Promise<void> {
     await this._authService.login(req.user, response);
   }
 }
