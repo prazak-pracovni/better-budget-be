@@ -1,11 +1,11 @@
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AccessTokenPayload } from './types/access-token.type';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class AuthService {
     private readonly _configService: ConfigService,
   ) {}
 
-  async register(user: CreateUserDto, response: Response): Promise<void> {
+  async register(user: CreateUserDto, res: Response): Promise<void> {
     const existingUser = await this._usersService.findOne({ email: user.email });
     if (existingUser) {
       throw new BadRequestException('User with this email address already exists');
@@ -25,10 +25,10 @@ export class AuthService {
     const newUser = { ...user, password: hashedPassword };
 
     const createdUser = await this._usersService.create(newUser);
-    this.login(createdUser, response);
+    this.login(createdUser, res);
   }
 
-  async login(user: User, response: Response): Promise<void> {
+  async login(user: User, res: Response): Promise<void> {
     const payload: AccessTokenPayload = { email: user.email, sub: user.id };
 
     const accessToken = this._jwtService.sign(payload, {
@@ -43,13 +43,26 @@ export class AuthService {
 
     await this._usersService.updateRefreshToken(user.id, await bcrypt.hash(refreshToken, 10));
 
-    response.cookie('refreshToken', refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
       expires: new Date(Date.now() + 1000 * 60),
       sameSite: 'none',
     });
-    response.json({ accessToken });
+    res.json({ accessToken });
+  }
+
+  async logout(req: Request, res: Response): Promise<HttpStatus> {
+    const refreshToken = req.cookies.refreshToken;
+    const user = await this._usersService.findOne({ refreshToken: refreshToken });
+    if (!user) {
+      res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none', secure: true });
+      return HttpStatus.NO_CONTENT;
+    }
+
+    await this._usersService.updateRefreshToken(user.id, '');
+    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none', secure: true });
+    return HttpStatus.NO_CONTENT;
   }
 
   async validateUser(email: string, password: string): Promise<User> {

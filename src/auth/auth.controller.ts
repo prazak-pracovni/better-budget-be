@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Request, Body, Res } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body, Res, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -20,6 +20,11 @@ export class AuthController {
   @Post('login')
   async login(@Request() req, @Res({ passthrough: true }) response: Response): Promise<void> {
     await this._authService.login(req.user, response);
+  }
+
+  @Post('logout')
+  async logout(@Request() req, @Res({ passthrough: true }) response: Response): Promise<HttpStatus> {
+    return await this._authService.logout(req, response);
   }
 
   @Post('register')
