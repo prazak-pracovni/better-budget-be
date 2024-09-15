@@ -56,12 +56,12 @@ export class AuthService {
     const refreshToken = req.cookies.refreshToken;
     const user = await this._usersService.findOne({ refreshToken: refreshToken });
     if (!user) {
-      res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none', secure: true });
+      res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'none' });
       return HttpStatus.NO_CONTENT;
     }
 
     await this._usersService.updateRefreshToken(user.id, '');
-    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none', secure: true });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'none' });
     return HttpStatus.NO_CONTENT;
   }
 
