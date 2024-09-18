@@ -1,5 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Category } from 'src/categories/entities/category.entity';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { ETrancactionType } from '../enums/transaction-type.enum';
 
@@ -30,10 +29,6 @@ export class TransactionRecord {
   @Column()
   createdByUserID: string;
 
-  @OneToOne(() => Category)
-  @JoinColumn()
-  category: Category;
-
   @Column()
-  categoryId: string;
+  categoryId?: string;
 }

@@ -36,8 +36,8 @@ export class AuthController {
     short: { limit: 1, ttl: 1000 },
     long: { limit: 2, ttl: 60000 },
   })
-  @UseGuards(JwtRefreshAuthGuard)
   @Public()
+  @UseGuards(JwtRefreshAuthGuard)
   @Post('refresh-token')
   async refreshToken(@Request() req, @Res({ passthrough: true }) response: Response): Promise<void> {
     await this._authService.login(req.user, response);

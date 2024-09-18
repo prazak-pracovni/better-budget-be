@@ -45,9 +45,9 @@ export class AuthService {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: true,
-      expires: new Date(Date.now() + 1000 * 60),
-      sameSite: 'none',
+      secure: false,
+      expires: new Date(Date.now() + 1000 * 60 * 60),
+      sameSite: 'lax',
     });
     res.json({ accessToken });
   }
@@ -56,12 +56,12 @@ export class AuthService {
     const refreshToken = req.cookies.refreshToken;
     const user = await this._usersService.findOne({ refreshToken: refreshToken });
     if (!user) {
-      res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'none' });
+      res.clearCookie('refreshToken', { httpOnly: true, secure: false, sameSite: 'lax' });
       return HttpStatus.NO_CONTENT;
     }
 
     await this._usersService.updateRefreshToken(user.id, '');
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'none' });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: false, sameSite: 'lax' });
     return HttpStatus.NO_CONTENT;
   }
 
