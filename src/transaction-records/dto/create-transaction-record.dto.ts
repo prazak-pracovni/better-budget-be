@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ETrancactionType } from '../enums/transaction-type.enum';
 
 export class CreateTransactionRecordDto {
@@ -14,6 +14,7 @@ export class CreateTransactionRecordDto {
   @IsString()
   title: string;
 
+  @IsOptional()
   @IsString()
   description: string;
 
@@ -21,6 +22,7 @@ export class CreateTransactionRecordDto {
   @IsString()
   date: string;
 
+  @IsOptional()
   @IsString()
   categoryId: string;
 }

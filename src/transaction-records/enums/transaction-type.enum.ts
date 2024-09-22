@@ -1,4 +1,4 @@
 export enum ETrancactionType {
-  EXPENSE,
-  INCOME,
+  EXPENSE = 'EXPENSE',
+  INCOME = 'INCOME',
 }

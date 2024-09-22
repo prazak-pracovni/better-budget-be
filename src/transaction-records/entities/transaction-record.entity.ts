@@ -16,19 +16,20 @@ export class TransactionRecord {
   @Column()
   title: string;
 
-  @Column()
-  desctiption?: string;
+  @Column({
+    nullable: true,
+  })
+  description: string | null;
 
   @Column()
   date: string;
 
   @ManyToOne(() => User, (user) => user.transactions, { cascade: true })
-  @JoinColumn()
+  @JoinColumn({ name: 'createdByUserID' })
   createdBy: User;
 
-  @Column()
-  createdByUserID: string;
-
-  @Column()
-  categoryId?: string;
+  @Column({
+    nullable: true,
+  })
+  categoryId: string | null;
 }

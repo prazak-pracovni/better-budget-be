@@ -5,6 +5,8 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Category } from './entities/category.entity';
 import { DeleteResult, UpdateResult } from 'typeorm';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -12,8 +14,8 @@ export class CategoriesController {
   constructor(private readonly _categoriesService: CategoriesService) {}
 
   @Post()
-  async create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
-    return this._categoriesService.create(createCategoryDto);
+  async create(@Body() createCategoryDto: CreateCategoryDto, @CurrentUser() user: User): Promise<Category> {
+    return this._categoriesService.create(createCategoryDto, user);
   }
 
   @Get()

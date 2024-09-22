@@ -5,6 +5,8 @@ import { UpdateTransactionRecordDto } from './dto/update-transaction-record.dto'
 import { ApiTags } from '@nestjs/swagger';
 import { TransactionRecord } from './entities/transaction-record.entity';
 import { DeleteResult, UpdateResult } from 'typeorm';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @ApiTags('Transaction records')
 @Controller('transaction-records')
@@ -12,8 +14,11 @@ export class TransactionRecordsController {
   constructor(private readonly _transactionRecordsService: TransactionRecordsService) {}
 
   @Post()
-  async create(@Body() createTransactionRecordDto: CreateTransactionRecordDto): Promise<TransactionRecord> {
-    return this._transactionRecordsService.create(createTransactionRecordDto);
+  async create(
+    @Body() createTransactionRecordDto: CreateTransactionRecordDto,
+    @CurrentUser() user: User,
+  ): Promise<TransactionRecord> {
+    return this._transactionRecordsService.create(createTransactionRecordDto, user);
   }
 
   @Get()
@@ -31,11 +36,11 @@ export class TransactionRecordsController {
     @Param('id') id: string,
     @Body() updateTransactionRecordDto: UpdateTransactionRecordDto,
   ): Promise<UpdateResult> {
-    return this._transactionRecordsService.update(+id, updateTransactionRecordDto);
+    return this._transactionRecordsService.update(id, updateTransactionRecordDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<DeleteResult> {
-    return this._transactionRecordsService.remove(+id);
+    return this._transactionRecordsService.remove(id);
   }
 }
