@@ -25,7 +25,7 @@ export class AuthService {
     const newUser = { ...user, password: hashedPassword };
 
     const createdUser = await this._usersService.create(newUser);
-    this.login(createdUser, res);
+    await this.login(createdUser, res);
   }
 
   async login(user: User, res: Response): Promise<void> {
