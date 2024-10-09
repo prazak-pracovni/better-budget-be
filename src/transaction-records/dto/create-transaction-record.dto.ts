@@ -1,9 +1,9 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ETrancactionType } from '../enums/transaction-type.enum';
 
 export class CreateTransactionRecordDto {
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   amount: number;
 
   @IsNotEmpty()

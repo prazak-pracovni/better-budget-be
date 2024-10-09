@@ -13,13 +13,19 @@ export class TransactionRecordsService {
 
   async create(createTransactionRecordDto: CreateTransactionRecordDto, user: User): Promise<TransactionRecord> {
     const transactionRecord = new TransactionRecord();
-    Object.assign(transactionRecord, { ...createTransactionRecordDto, createdBy: user });
+    const date = new Date(createTransactionRecordDto.date);
+
+    Object.assign(transactionRecord, { ...createTransactionRecordDto, createdBy: user, date });
 
     return this._transactionRecordRepository.save(transactionRecord);
   }
 
   async findAll(): Promise<TransactionRecord[]> {
-    return this._transactionRecordRepository.find();
+    return this._transactionRecordRepository.find({
+      order: {
+        date: 'DESC',
+      },
+    });
   }
 
   async findOne(id: string): Promise<TransactionRecord> {

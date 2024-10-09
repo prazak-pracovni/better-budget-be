@@ -9,6 +9,9 @@ export class Category {
   @Column()
   title: string;
 
+  @Column({ nullable: true })
+  color: string;
+
   @ManyToOne(() => User, (user) => user.categories, { cascade: true })
   @JoinColumn({ name: 'createdByUserID' })
   createdBy: User;

@@ -21,8 +21,8 @@ export class TransactionRecord {
   })
   description: string | null;
 
-  @Column()
-  date: string;
+  @Column({ type: 'timestamptz' })
+  date: Date;
 
   @ManyToOne(() => User, (user) => user.transactions, { cascade: true })
   @JoinColumn({ name: 'createdByUserID' })
