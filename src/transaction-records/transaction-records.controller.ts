@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { TransactionRecordsService } from './transaction-records.service';
 import { CreateTransactionRecordDto } from './dto/create-transaction-record.dto';
 import { UpdateTransactionRecordDto } from './dto/update-transaction-record.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { TransactionRecord } from './entities/transaction-record.entity';
-import { DeleteResult, UpdateResult } from 'typeorm';
+import { DeleteResult, FindOptionsOrderValue, UpdateResult } from 'typeorm';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 
@@ -22,8 +22,8 @@ export class TransactionRecordsController {
   }
 
   @Get()
-  async findAll(): Promise<TransactionRecord[]> {
-    return this._transactionRecordsService.findAll();
+  async findAll(@Query('order') order: FindOptionsOrderValue = 'desc'): Promise<TransactionRecord[]> {
+    return this._transactionRecordsService.findAll(order);
   }
 
   @Get(':id')

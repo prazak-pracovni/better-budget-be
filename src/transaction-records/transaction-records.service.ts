@@ -3,7 +3,7 @@ import { CreateTransactionRecordDto } from './dto/create-transaction-record.dto'
 import { UpdateTransactionRecordDto } from './dto/update-transaction-record.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionRecord } from './entities/transaction-record.entity';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, FindOptionsOrderValue, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
@@ -20,10 +20,10 @@ export class TransactionRecordsService {
     return this._transactionRecordRepository.save(transactionRecord);
   }
 
-  async findAll(): Promise<TransactionRecord[]> {
+  async findAll(order: FindOptionsOrderValue): Promise<TransactionRecord[]> {
     return this._transactionRecordRepository.find({
       order: {
-        date: 'DESC',
+        date: order,
       },
     });
   }
