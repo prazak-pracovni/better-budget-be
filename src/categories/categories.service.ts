@@ -18,8 +18,14 @@ export class CategoriesService {
     return this._categoryRepository.save(category);
   }
 
-  async findAll(): Promise<Category[]> {
-    return this._categoryRepository.find();
+  async findAllUserCategories(user: User): Promise<Category[]> {
+    return this._categoryRepository.find({
+      where: {
+        createdBy: {
+          id: user.id,
+        },
+      },
+    });
   }
 
   async findOne(id: string): Promise<Category> {

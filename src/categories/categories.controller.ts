@@ -19,8 +19,8 @@ export class CategoriesController {
   }
 
   @Get()
-  async findAll(): Promise<Category[]> {
-    return this._categoriesService.findAll();
+  async findAll(@CurrentUser() user: User): Promise<Category[]> {
+    return this._categoriesService.findAllUserCategories(user);
   }
 
   @Get(':id')

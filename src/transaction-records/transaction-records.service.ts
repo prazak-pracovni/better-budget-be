@@ -20,8 +20,13 @@ export class TransactionRecordsService {
     return this._transactionRecordRepository.save(transactionRecord);
   }
 
-  async findAll(order: FindOptionsOrderValue): Promise<TransactionRecord[]> {
+  async findAllUserTransactions(user: User, order: FindOptionsOrderValue): Promise<TransactionRecord[]> {
     return this._transactionRecordRepository.find({
+      where: {
+        createdBy: {
+          id: user.id,
+        },
+      },
       order: {
         date: order,
       },

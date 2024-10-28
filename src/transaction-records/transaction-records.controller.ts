@@ -22,8 +22,11 @@ export class TransactionRecordsController {
   }
 
   @Get()
-  async findAll(@Query('order') order: FindOptionsOrderValue = 'desc'): Promise<TransactionRecord[]> {
-    return this._transactionRecordsService.findAll(order);
+  async findAll(
+    @CurrentUser() user: User,
+    @Query('order') order: FindOptionsOrderValue = 'desc',
+  ): Promise<TransactionRecord[]> {
+    return this._transactionRecordsService.findAllUserTransactions(user, order);
   }
 
   @Get(':id')
