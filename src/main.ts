@@ -15,7 +15,7 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization, Cookie',
   });
   app.use(cookieParser());
-  app.useGlobalPipes(new ValidationPipe({}));
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   //Swagger initialization
   const config = new DocumentBuilder().setTitle('Better budget API').setVersion('1.0').build();

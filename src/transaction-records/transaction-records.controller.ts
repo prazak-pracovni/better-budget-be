@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ValidationPipe } from '@nestjs/common';
 import { TransactionRecordsService } from './transaction-records.service';
 import { CreateTransactionRecordDto } from './dto/create-transaction-record.dto';
 import { UpdateTransactionRecordDto } from './dto/update-transaction-record.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { TransactionRecord } from './entities/transaction-record.entity';
-import { DeleteResult, FindOptionsOrderValue, UpdateResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/users/entities/user.entity';
+import { TransactionRecordFilterDto } from './dto/transaction-record-filter.dto';
+import { TransactionRecordsDto } from './dto/transaction-records.dto';
 
 @ApiTags('Transaction records')
 @Controller('transaction-records')
@@ -24,9 +26,10 @@ export class TransactionRecordsController {
   @Get()
   async findAll(
     @CurrentUser() user: User,
-    @Query('order') order: FindOptionsOrderValue = 'desc',
-  ): Promise<TransactionRecord[]> {
-    return this._transactionRecordsService.findAllUserTransactions(user, order);
+    @Query('order', new ValidationPipe({ transform: true })) order: 'ASC' | 'DESC' = 'DESC',
+    @Query(new ValidationPipe({ transform: true })) filter: TransactionRecordFilterDto,
+  ): Promise<TransactionRecordsDto> {
+    return this._transactionRecordsService.findAllUserTransactions(user, order, filter);
   }
 
   @Get(':id')
