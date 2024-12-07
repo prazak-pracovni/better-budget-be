@@ -55,6 +55,22 @@ export class TransactionRecordsService {
     };
   }
 
+  async calculateUserBalance(user: User, date?: Date): Promise<number> {
+    const now = new Date();
+    const targetDate = date || now;
+
+    const { balance } = await this._transactionRecordRepository
+      .createQueryBuilder('transactionRecord')
+      .select(
+        `SUM(CASE WHEN transactionRecord.type = 'INCOME' THEN transactionRecord.amount ELSE -(transactionRecord.amount) END) as balance`,
+      )
+      .where('transactionRecord.createdBy = :userId', { userId: user.id })
+      .andWhere('transactionRecord.date <= :date', { date: targetDate })
+      .getRawOne();
+
+    return balance || 0;
+  }
+
   async findOne(id: string): Promise<TransactionRecord> {
     return this._transactionRecordRepository.findOneBy({ id });
   }

@@ -32,6 +32,11 @@ export class TransactionRecordsController {
     return this._transactionRecordsService.findAllUserTransactions(user, order, filter);
   }
 
+  @Get('balance')
+  async calculateBalance(@CurrentUser() user: User, @Query('date') date: Date): Promise<number> {
+    return this._transactionRecordsService.calculateUserBalance(user, date);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<TransactionRecord> {
     return this._transactionRecordsService.findOne(id);
