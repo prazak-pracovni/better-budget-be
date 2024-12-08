@@ -78,8 +78,6 @@ export class TransactionRecordsService {
       .setParameter('date', date ?? new Date())
       .getRawOne();
 
-    console.log('Balance on date', balanceOnDate);
-
     return {
       balanceOnDate: Number(balanceOnDate),
       totalBalance: Number(totalBalance),
