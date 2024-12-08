@@ -9,6 +9,7 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { TransactionRecordFilterDto } from './dto/transaction-record-filter.dto';
 import { TransactionRecordsDto } from './dto/transaction-records.dto';
+import { BalanceDto } from 'src/transaction-records/dto/balance.dto';
 
 @ApiTags('Transaction records')
 @Controller('transaction-records')
@@ -33,7 +34,7 @@ export class TransactionRecordsController {
   }
 
   @Get('balance')
-  async calculateBalance(@CurrentUser() user: User, @Query('date') date: Date): Promise<number> {
+  async calculateBalance(@CurrentUser() user: User, @Query('date') date: Date): Promise<BalanceDto> {
     return this._transactionRecordsService.calculateUserBalance(user, date);
   }
 

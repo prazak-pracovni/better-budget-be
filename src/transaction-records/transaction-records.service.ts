@@ -7,6 +7,8 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { TransactionRecordFilterDto } from './dto/transaction-record-filter.dto';
 import { TransactionRecordsDto } from './dto/transaction-records.dto';
+import { BalanceDto } from 'src/transaction-records/dto/balance.dto';
+import { ETrancactionType } from 'src/transaction-records/enums/transaction-type.enum';
 
 @Injectable()
 export class TransactionRecordsService {
@@ -55,20 +57,33 @@ export class TransactionRecordsService {
     };
   }
 
-  async calculateUserBalance(user: User, date?: Date): Promise<number> {
-    const now = new Date();
-    const targetDate = date || now;
-
-    const { balance } = await this._transactionRecordRepository
-      .createQueryBuilder('transactionRecord')
-      .select(
-        `SUM(CASE WHEN transactionRecord.type = 'INCOME' THEN transactionRecord.amount ELSE -(transactionRecord.amount) END) as balance`,
-      )
-      .where('transactionRecord.createdBy = :userId', { userId: user.id })
-      .andWhere('transactionRecord.date <= :date', { date: targetDate })
+  async calculateUserBalance(user: User, date?: Date): Promise<BalanceDto> {
+    const { balanceOnDate, totalBalance } = await this._transactionRecordRepository
+      .createQueryBuilder('tr')
+      .where('tr.createdBy = :userId', { userId: user.id })
+      .select([
+        `SUM(
+          CASE tr.type
+            WHEN '${ETrancactionType.INCOME}' THEN tr.amount
+            ELSE -tr.amount
+          END
+        ) FILTER (WHERE tr.date <= :date) as "balanceOnDate"`,
+        `SUM(
+          CASE tr.type
+            WHEN '${ETrancactionType.INCOME}' THEN tr.amount
+            ELSE -tr.amount
+          END
+        ) as "totalBalance"`,
+      ])
+      .setParameter('date', date ?? new Date())
       .getRawOne();
 
-    return balance || 0;
+    console.log('Balance on date', balanceOnDate);
+
+    return {
+      balanceOnDate: Number(balanceOnDate),
+      totalBalance: Number(totalBalance),
+    };
   }
 
   async findOne(id: string): Promise<TransactionRecord> {
