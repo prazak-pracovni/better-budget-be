@@ -61,20 +61,22 @@ export class TransactionRecordsService {
     const { balanceOnDate, totalBalance } = await this._transactionRecordRepository
       .createQueryBuilder('tr')
       .where('tr.createdBy = :userId', { userId: user.id })
-      .select([
+      .select(
         `SUM(
           CASE tr.type
             WHEN '${ETrancactionType.INCOME}' THEN tr.amount
             ELSE -tr.amount
           END
         ) FILTER (WHERE tr.date <= :date) as "balanceOnDate"`,
+      )
+      .addSelect(
         `SUM(
           CASE tr.type
             WHEN '${ETrancactionType.INCOME}' THEN tr.amount
             ELSE -tr.amount
           END
         ) as "totalBalance"`,
-      ])
+      )
       .setParameter('date', date ?? new Date())
       .getRawOne();
 
